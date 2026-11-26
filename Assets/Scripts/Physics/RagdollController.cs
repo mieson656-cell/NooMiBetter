@@ -28,10 +28,14 @@ namespace NooMiBetter
             var head = Part("Head", PrimitiveType.Sphere, origin + Vector3.up*.72f, new Vector3(.25f,.25f,.25f), .45f, material);
             Link(Torso, head, origin + Vector3.up*.48f, new Vector3(25,25,25));
             var leftUpperArm = Part("Left Upper Arm", PrimitiveType.Capsule, origin + new Vector3(-.38f,.25f,0), new Vector3(.16f,.36f,.16f), .55f, material);
+            leftUpperArm.rotation=Quaternion.Euler(0,0,90);
             var leftForearm = Part("Left Forearm", PrimitiveType.Capsule, origin + new Vector3(-.48f,.68f,0), new Vector3(.13f,.32f,.13f), .4f, material);
+            leftForearm.rotation=Quaternion.Euler(0,0,90);
             LeftHand = Part("Left Hand", PrimitiveType.Sphere, origin + new Vector3(-.5f,1.02f,0), new Vector3(.17f,.17f,.17f), .2f, material);
             var rightUpperArm = Part("Right Upper Arm", PrimitiveType.Capsule, origin + new Vector3(.38f,.25f,0), new Vector3(.16f,.36f,.16f), .55f, material);
+            rightUpperArm.rotation=Quaternion.Euler(0,0,-90);
             var rightForearm = Part("Right Forearm", PrimitiveType.Capsule, origin + new Vector3(.48f,.68f,0), new Vector3(.13f,.32f,.13f), .4f, material);
+            rightForearm.rotation=Quaternion.Euler(0,0,-90);
             RightHand = Part("Right Hand", PrimitiveType.Sphere, origin + new Vector3(.5f,1.02f,0), new Vector3(.17f,.17f,.17f), .2f, material);
             Link(Torso,leftUpperArm,origin+new Vector3(-.25f,.43f,0),new Vector3(80,80,45));
             Link(leftUpperArm,leftForearm,origin+new Vector3(-.43f,.48f,0),new Vector3(110,10,10));
@@ -57,6 +61,8 @@ namespace NooMiBetter
         {
             var go=GameObject.CreatePrimitive(type);go.name=name;go.transform.position=position;go.transform.localScale=scale;
             go.GetComponent<Renderer>().material=material;
+            var collider=go.GetComponent<Collider>();
+            foreach(var existing in parts){var other=existing.GetComponent<Collider>();if(collider && other)Physics.IgnoreCollision(collider,other,true);}
             var rb=go.AddComponent<Rigidbody>();rb.mass=mass;rb.interpolation=RigidbodyInterpolation.Interpolate;
             rb.collisionDetectionMode=CollisionDetectionMode.Continuous;
             parts.Add(rb);return rb;
