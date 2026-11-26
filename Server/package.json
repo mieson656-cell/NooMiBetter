@@ -1,0 +1,12 @@
+{
+  "name": "noomibetter-relay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Room relay for NooMiBetter multiplayer prototype",
+  "scripts": {
+    "start": "node relay-server.js",
+    "check": "node --check relay-server.js && node --check relay-server.test.js",
+    "test": "node relay-server.test.js"
+  },
+  "engines": { "node": ">=18" }
+}
