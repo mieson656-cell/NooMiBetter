@@ -53,14 +53,19 @@ The Unity editor build entry point is `NooMiBetter.Editor.NooMiBuild.BuildAndroi
 
 ### Known gaps before a public release
 
-- The current gymnast is a physics-driven capsule prototype, not a full articulated ragdoll skeleton.
-- The multiplayer relay is a prototype transport; client-side Unity networking integration, interpolation, reconnect handling and authoritative validation remain to be completed.
-- Audio and texture byte-loading helpers exist; a polished in-game file picker and complete import UX are not yet integrated.
-- The shop and inventory economy are foundational local-profile systems, not a finished content catalog.
-- Replay recording exists; a complete replay browser/export UI remains outstanding.
+- The gymnast is an articulated primitive-based ragdoll blockout; joint tuning and visual polish remain.
+- The Unity client now connects to the prototype relay and exchanges torso poses. Full-body synchronization, reconnect handling and authoritative validation remain incomplete.
+- Procedural skin generation is available in-game; Android image/audio file import UX is not yet integrated.
+- The shop has a small local cosmetic palette and landing achievements, not a finished content catalog.
+- Replay recording and basic playback controls are available; persistent replay browser/export remains outstanding.
 - Unity compilation and Android device testing have not yet been performed in this environment.
 
 
 ## Build status
 
 See [BUILD_STATUS.md](BUILD_STATUS.md) for the implemented prototype, current limitations, and verification status. The current Android build workflow requires a valid Unity license in the repository secret `UNITY_LICENSE`. A successful APK build has not yet been verified.
+
+
+### Relay deployment
+
+See [Server/DEPLOYMENT.md](Server/DEPLOYMENT.md) for the Docker deployment path. Configure a public HTTPS relay URL in the in-game Relay Server field; the default localhost address only works when the relay runs on the same device.
