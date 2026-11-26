@@ -68,7 +68,7 @@ def strip_comments_and_strings(source):
             continue
         if state in ("string", "char"):
             terminator = '"' if state == "string" else "'"
-            if ch == "\\\\":
+            if ord(ch) == 92:
                 out.extend("  "); i += 2; continue
             if ch == terminator:
                 state = "code"
