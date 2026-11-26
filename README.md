@@ -69,3 +69,8 @@ See [BUILD_STATUS.md](BUILD_STATUS.md) for the implemented prototype, current li
 ### Relay deployment
 
 See [Server/DEPLOYMENT.md](Server/DEPLOYMENT.md) for the Docker deployment path. Configure a public HTTPS relay URL in the in-game Relay Server field; the default localhost address only works when the relay runs on the same device.
+
+
+## Android build setup
+
+See [Documentation/ANDROID_BUILD.md](Documentation/ANDROID_BUILD.md) for the Unity license secret setup and APK artifact instructions. The workflow skips compilation when no Unity license is configured; a green skipped run is not an APK build.
