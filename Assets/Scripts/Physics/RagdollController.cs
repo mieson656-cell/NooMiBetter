@@ -73,7 +73,8 @@ namespace NooMiBetter
             joint.anchor=b.transform.InverseTransformPoint(worldAnchor);joint.connectedAnchor=a.transform.InverseTransformPoint(worldAnchor);
             joint.xMotion=joint.yMotion=joint.zMotion=ConfigurableJointMotion.Locked;
             joint.angularXMotion=joint.angularYMotion=joint.angularZMotion=ConfigurableJointMotion.Limited;
-            var angular=new SoftJointLimit{limit=limits.x};joint.lowAngularXLimit=angular;joint.highAngularXLimit=angular;
+            joint.lowAngularXLimit=new SoftJointLimit{limit=-limits.x};
+            joint.highAngularXLimit=new SoftJointLimit{limit=limits.x};
             joint.angularYLimit=new SoftJointLimit{limit=limits.y};joint.angularZLimit=new SoftJointLimit{limit=limits.z};
             joint.enablePreprocessing=false;
         }
@@ -93,13 +94,24 @@ namespace NooMiBetter
         }
         public void Release()
         {
-            foreach(var joint in handJoints) if(joint) Destroy(joint);
-            handJoints.Clear();IsAttached=false;
+            foreach(var joint in handJoints) if(joint) {
+                joint.connectedBody=null;
+                joint.xMotion=joint.yMotion=joint.zMotion=ConfigurableJointMotion.Free;
+            }
+            IsAttached=false;
         }
         public void Grab()
         {
             if(IsAttached)return;
-            AttachHands();
+            if(handJoints.Count==0) AttachHands();
+            else foreach(var joint in handJoints) if(joint) {
+                joint.connectedBody=barAnchor;
+                joint.anchor=Vector3.zero;
+                joint.connectedAnchor=joint.transform.position-barAnchor.position;
+                joint.xMotion=joint.yMotion=joint.zMotion=ConfigurableJointMotion.Limited;
+                joint.linearLimit=new SoftJointLimit{limit=.12f};
+            }
+            IsAttached=true;
             foreach(var rb in parts){rb.velocity=Vector3.zero;rb.angularVelocity=Vector3.zero;}
         }
         public void SetMaterial(Material material)
