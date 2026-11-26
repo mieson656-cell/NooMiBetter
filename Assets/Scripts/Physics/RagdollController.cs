@@ -12,6 +12,9 @@ namespace NooMiBetter
         private Rigidbody barAnchor;
         private readonly List<Rigidbody> parts = new List<Rigidbody>();
         private readonly List<ConfigurableJoint> handJoints = new List<ConfigurableJoint>();
+        private Vector3[] startPositions;
+        private Quaternion[] startRotations;
+        private Vector3 startTorsoPosition;
 
         public void Build(Vector3 origin, Transform parent, Material material)
         {
@@ -45,6 +48,9 @@ namespace NooMiBetter
             Link(Torso,rightThigh,origin+new Vector3(.16f,-.28f,0),new Vector3(55,45,30));
             Link(rightThigh,rightShin,origin+new Vector3(.16f,-.78f,0),new Vector3(120,10,10));
             AttachHands();
+            startTorsoPosition=Torso.position;
+            startPositions=new Vector3[parts.Count];startRotations=new Quaternion[parts.Count];
+            for(int i=0;i<parts.Count;i++){startPositions[i]=parts[i].position;startRotations[i]=parts[i].rotation;}
         }
 
         private Rigidbody Part(string name, PrimitiveType type, Vector3 position, Vector3 scale, float mass, Material material)
@@ -98,14 +104,12 @@ namespace NooMiBetter
         public void ResetBody(Vector3 origin)
         {
             Release();
-            foreach(var rb in parts){rb.velocity=Vector3.zero;rb.angularVelocity=Vector3.zero;}
-            Torso.position=origin;Torso.rotation=Quaternion.identity;
-            // Reposition each limb relative to torso after removing joint forces.
-            foreach(var rb in parts) {
-                if(rb==Torso) continue;
-                Vector3 offset=rb.transform.position - Torso.position;
-                rb.position=Torso.position+offset;
+            Vector3 delta=origin-startTorsoPosition;
+            for(int i=0;i<parts.Count;i++){
+                var rb=parts[i];rb.velocity=Vector3.zero;rb.angularVelocity=Vector3.zero;
+                rb.position=startPositions[i]+delta;rb.rotation=startRotations[i];
             }
+            Physics.SyncTransforms();
             Grab();
         }
         public float LowestY
