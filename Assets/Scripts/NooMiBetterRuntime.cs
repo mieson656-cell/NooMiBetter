@@ -13,7 +13,7 @@ namespace NooMiBetter
         bool recordingReplay;
         Texture2D generatedSkin;
         Text scoreLabel,walletLabel,stateLabel,roomLabel;
-        InputField roomInput;
+        InputField roomInput,serverInput;
         readonly Dictionary<string,Transform> remotePlayers=new Dictionary<string,Transform>();
         Material gymnastMaterial;
         int coins,score;
@@ -34,6 +34,7 @@ namespace NooMiBetter
             multiplayer=gameObject.AddComponent<MultiplayerRelayClient>();
             multiplayer.OnRemotePose+=OnRemotePose;
             multiplayer.serverUrl=PlayerPrefs.GetString("nmb_relay_url","http://127.0.0.1:8787");
+            if(serverInput!=null)serverInput.text=multiplayer.serverUrl;
         }
         private Material Mat(Color color)
         {
@@ -80,6 +81,8 @@ namespace NooMiBetter
             Button(canvas.transform,"CREATE ROOM",new Vector2(.22f,.045f),new Vector2(260,75),CreateRoom);
             Button(canvas.transform,"JOIN",new Vector2(.78f,.045f),new Vector2(180,75),JoinRoom);
             roomLabel=Label(canvas.transform,"MULTIPLAYER: OFFLINE",18,new Vector2(.5f,.005f),new Vector2(850,60));
+            serverInput=Input(canvas.transform,"https://your-relay.example",new Vector2(.38f,.20f),new Vector2(620,70));
+            Button(canvas.transform,"SET SERVER",new Vector2(.82f,.20f),new Vector2(230,75),SetRelayUrl);
             Button(canvas.transform,"SKIN / SHOP",new Vector2(.2f,.82f),new Vector2(260,75),BuySkin);
             Button(canvas.transform,"TEXTURE LAB",new Vector2(.8f,.82f),new Vector2(260,75),GenerateSkin);
             Button(canvas.transform,"REPLAY",new Vector2(.5f,.82f),new Vector2(220,75),ToggleReplay);
@@ -155,6 +158,13 @@ namespace NooMiBetter
         {
             bool low=PlayerPrefs.GetInt("nmb_low_power",0)==0;PerformanceSettings.ApplyLowPower(low);
             stateLabel.text=low?"LOW POWER 30 FPS":"PERFORMANCE 60 FPS";
+        }
+        private void SetRelayUrl()
+        {
+            string value=(serverInput.text??"").Trim().TrimEnd('/');
+            if(!(value.StartsWith("https://")||value.StartsWith("http://"))){roomLabel.text="SERVER URL MUST START WITH HTTP(S)";return;}
+            PlayerPrefs.SetString("nmb_relay_url",value);PlayerPrefs.Save();
+            multiplayer.serverUrl=value;multiplayer.Leave();roomLabel.text="RELAY SERVER SAVED";
         }
         private void CreateRoom(){StartCoroutine(multiplayer.CreateRoom(code=>{if(!string.IsNullOrEmpty(code)){roomInput.text=code;roomLabel.text="ROOM "+code+" — SHARE THIS CODE";}else roomLabel.text="ROOM CREATION FAILED";}));}
         private void JoinRoom(){StartCoroutine(multiplayer.JoinRoom(roomInput.text,ok=>roomLabel.text=ok?"JOINED ROOM "+multiplayer.RoomCode:"COULD NOT JOIN ROOM"));}
