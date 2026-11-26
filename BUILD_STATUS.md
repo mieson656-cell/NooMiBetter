@@ -2,26 +2,33 @@
 
 Updated: 2026-11-26
 
-## Implemented in the repository
+## Implemented
 
-- Unity 2022.3 project skeleton and Android editor setup.
-- A runtime-generated playable training scene with a gymnast capsule, fixed bar anchor, floor, camera and directional light.
-- On-screen controls for flip, grab/release, reset and low-power mode.
-- Local score and coin persistence.
-- Separate utility components for replay frame capture, local profile values, procedural texture generation, theme palette, audio loading and workshop map serialization.
-- Node.js multiplayer room relay with create/join, state event relay, room membership checks, rate limiting and expiry.
-- Static project validator and Node relay test suite.
-- GitHub Actions workflows for project validation, relay tests and Unity Android APK build.
+- Unity 2022.3 project skeleton with automatic main-scene and Android build setup.
+- Articulated rigidbody ragdoll prototype: torso, head, upper/lower arms, hands, thighs and shins, connected by configurable joints.
+- Bar hand constraints with grab/release, trick impulses, landing detection and reset.
+- Runtime HUD, score, coin rewards, local cosmetic purchases and landing achievements.
+- Procedural texture pattern generation and in-game skin application.
+- Replay frame capture with a basic record/playback control.
+- Performance preset (30/60 FPS).
+- Multiplayer room creation/join UI, configurable relay URL, pose upload and remote player pose display.
+- Node.js room relay with membership checks, rate limiting, room expiry and bounded event history.
+- Docker deployment files and relay deployment notes.
+- Static project validator, relay integration tests and GitHub Actions workflows for validation and Android APK builds.
 
-## Release blockers / limitations
+## Known limitations
 
-- The playable character is currently a single rigidbody capsule. It is not yet the articulated ragdoll gymnast planned for the full game.
-- The Unity client is not yet connected to the multiplayer relay. The relay is a standalone prototype service.
-- Replay capture and texture/audio helper systems are not yet fully surfaced through the runtime HUD.
-- A native Android file-picker bridge and complete import UX are not integrated in this repository version.
-- No Unity Editor or Android SDK is installed in the current execution environment, so an actual Unity compile, APK build, install or device test has not been performed here.
-- GitHub Actions Android build requires a valid Unity license configured as the repository secret `UNITY_LICENSE`.
+- The gymnast is a blockout ragdoll made from Unity primitive colliders, not a polished character model. Joint tuning and collision/animation testing are still needed.
+- Multiplayer currently transmits the torso transform only. It does not synchronize all ragdoll limbs, player identity, authoritative physics, voice, chat, room leave events or reconnect recovery.
+- The relay is an in-memory prototype. It needs HTTPS termination and stronger authentication/abuse controls before public use. Rooms disappear on server restart.
+- The texture lab generates procedural patterns. Importing PNG/JPG through a polished Android file picker is not yet wired into the HUD.
+- Audio file loading helpers exist, but user music/effect import controls are not yet integrated.
+- Replay is a basic in-memory torso transform recording, not a persistent replay browser or video export.
+- The workshop serializer and obstacle definitions exist, but the full map editor UI is incomplete.
+- The shop currently contains a small local cosmetic palette; there is no online store or payment system.
 
-## Verification
+## Build and verification status
 
-The project validator checks required source files, JSON/XML syntax, Android target settings and basic C# delimiter balance. The Node workflow runs syntax checks and relay integration tests. These checks are not substitutes for a Unity compile or Android device test.
+The repository contains an Android ARM64/IL2CPP build entry point and GitHub Actions workflow. The workflow requires a valid Unity license stored as the repository secret `UNITY_LICENSE`.
+
+No successful Unity compilation, APK build, install, or physical Android device test has been confirmed in this environment. Static validation and the Node relay tests are useful checks but do not prove that Unity compiles or that the game runs correctly on a phone.
