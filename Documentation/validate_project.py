@@ -34,7 +34,7 @@ assert "AndroidArchitecture.ARM64" in (root / "Assets/Editor/NooMiBetterProjectS
 # Basic delimiter sanity check after stripping comments and string literals.
 for path in (root / "Assets").rglob("*.cs"):
     source = path.read_text(encoding="utf-8")
-    source = re.sub(r'//.*?$|/\\*.*?\\*/|@?"(?:\\\\.|[^"\\\\])*"', "", source, flags=re.M | re.S)
+        source = re.sub(r'//[^\n]*|/\*.*?\*/|@?"(?:\\.|[^"\\])*"', "", source, flags=re.S)
     for left, right in (("{", "}"), ("(", ")"), ("[", "]")):
         depth = 0
         for char in source:
