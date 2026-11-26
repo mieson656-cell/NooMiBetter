@@ -1,0 +1,25 @@
+name: Android APK
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  build:
+    name: Build Android ARM64 APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          targetPlatform: Android
+          buildMethod: NooMiBetter.Editor.NooMiBuild.BuildAndroid
+          androidAppBundle: false
+          customParameters: -quit
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NooMiBetter-Android-APK
+          path: build/Android/*.apk
+          if-no-files-found: error
