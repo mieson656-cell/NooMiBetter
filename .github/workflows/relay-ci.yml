@@ -1,0 +1,23 @@
+name: Relay CI
+on:
+  push:
+    paths:
+      - 'Server/**'
+      - '.github/workflows/relay-ci.yml'
+  pull_request:
+    paths:
+      - 'Server/**'
+      - '.github/workflows/relay-ci.yml'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run check
+        working-directory: Server
+      - run: npm test
+        working-directory: Server
