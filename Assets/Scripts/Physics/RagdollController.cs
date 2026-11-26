@@ -96,6 +96,10 @@ namespace NooMiBetter
             AttachHands();
             foreach(var rb in parts){rb.velocity=Vector3.zero;rb.angularVelocity=Vector3.zero;}
         }
+        public void SetMaterial(Material material)
+        {
+            foreach(var rb in parts){var renderer=rb.GetComponent<Renderer>();if(renderer)renderer.material=material;}
+        }
         public void AddTrickImpulse(float torque)
         {
             foreach(var rb in parts) rb.AddTorque(Vector3.forward*torque*(rb==Torso?1f:.15f),ForceMode.Impulse);
