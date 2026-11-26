@@ -12,14 +12,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check Unity license availability
+        id: license
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        shell: bash
+        run: |
+          if [ -n "$UNITY_LICENSE" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::APK build skipped: add a valid Unity license as the UNITY_LICENSE repository secret."
+            echo "## Android APK build skipped" >> "$GITHUB_STEP_SUMMARY"
+            echo "A valid Unity license is required. Add the repository secret UNITY_LICENSE and rerun this workflow." >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: game-ci/unity-builder@v4
+        if: steps.license.outputs.available == 'true'
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           targetPlatform: Android
           buildMethod: NooMiBetter.Editor.NooMiBuild.BuildAndroid
-          androidAppBundle: false
       - uses: actions/upload-artifact@v4
+        if: steps.license.outputs.available == 'true'
         with:
           name: NooMiBetter-Android-APK
           path: Build/NooMiBetter.apk
