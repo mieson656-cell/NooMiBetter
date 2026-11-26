@@ -182,7 +182,7 @@ namespace NooMiBetter
         {
             if(airborne){
                 flightTime+=Time.deltaTime;
-                if(gymnast.LowestY<-.75f){
+                if(gymnast.LowestY<-1.12f){
                     int reward=flightTime>1.1f?15:5;coins+=reward;score+=reward*20;AchievementTracker.CountLanding(reward==15);
                     PlayerPrefs.SetInt("nmb_coins",coins);PlayerPrefs.Save();
                     walletLabel.text="COINS  "+coins;scoreLabel.text="SCORE  "+score;
