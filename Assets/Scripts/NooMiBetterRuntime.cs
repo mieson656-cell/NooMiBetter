@@ -9,6 +9,9 @@ namespace NooMiBetter
     {
         RagdollController gymnast;
         MultiplayerRelayClient multiplayer;
+        ReplayRecorder replay;
+        bool recordingReplay;
+        Texture2D generatedSkin;
         Text scoreLabel,walletLabel,stateLabel,roomLabel;
         InputField roomInput;
         readonly Dictionary<string,Transform> remotePlayers=new Dictionary<string,Transform>();
@@ -26,6 +29,8 @@ namespace NooMiBetter
         {
             PerformanceSettings.ApplyLowPower(PlayerPrefs.GetInt("nmb_low_power",0)==1);
             BuildWorld();BuildHud();
+            replay=gameObject.AddComponent<ReplayRecorder>();replay.target=gymnast.Torso;
+            ApplySkin();
             multiplayer=gameObject.AddComponent<MultiplayerRelayClient>();
             multiplayer.OnRemotePose+=OnRemotePose;
             multiplayer.serverUrl=PlayerPrefs.GetString("nmb_relay_url","http://127.0.0.1:8787");
@@ -75,6 +80,9 @@ namespace NooMiBetter
             Button(canvas.transform,"CREATE ROOM",new Vector2(.22f,.045f),new Vector2(260,75),CreateRoom);
             Button(canvas.transform,"JOIN",new Vector2(.78f,.045f),new Vector2(180,75),JoinRoom);
             roomLabel=Label(canvas.transform,"MULTIPLAYER: OFFLINE",18,new Vector2(.5f,.005f),new Vector2(850,60));
+            Button(canvas.transform,"SKIN / SHOP",new Vector2(.2f,.82f),new Vector2(260,75),BuySkin);
+            Button(canvas.transform,"TEXTURE LAB",new Vector2(.8f,.82f),new Vector2(260,75),GenerateSkin);
+            Button(canvas.transform,"REPLAY",new Vector2(.5f,.82f),new Vector2(220,75),ToggleReplay);
         }
         private Text Label(Transform parent,string value,int size,Vector2 anchor,Vector2 dimensions)
         {
@@ -101,6 +109,40 @@ namespace NooMiBetter
             field.textComponent=text;field.characterLimit=6;field.contentType=InputField.ContentType.Alphanumeric;
             field.placeholder=Label(go.transform,placeholder,17,new Vector2(.5f,.5f),dimensions);field.placeholder.color=new Color(.65f,.68f,.75f);
             return field;
+        }
+        private void ApplySkin()
+        {
+            if(generatedSkin!=null)Destroy(generatedSkin);
+            gymnastMaterial=Mat(CosmeticShop.CurrentColor);
+            if(generatedSkin!=null)gymnastMaterial.mainTexture=generatedSkin;
+            gymnast.SetMaterial(gymnastMaterial);
+        }
+        private void BuySkin()
+        {
+            if(CosmeticShop.PurchaseNext()){
+                coins=LocalProfile.Coins;walletLabel.text="COINS  "+coins;ApplySkin();
+                stateLabel.text="COSMETIC UNLOCKED";
+            }else stateLabel.text="NOT ENOUGH COINS — NEXT SKIN";
+        }
+        private void GenerateSkin()
+        {
+            if(generatedSkin!=null)Destroy(generatedSkin);
+            generatedSkin=TexturePatternGenerator.Create(128,128,CosmeticShop.CurrentColor,Color.white,Random.Range(0,99999));
+            gymnastMaterial.mainTexture=generatedSkin;gymnast.SetMaterial(gymnastMaterial);
+            stateLabel.text="TEXTURE LAB — PATTERN APPLIED";
+        }
+        private void ToggleReplay()
+        {
+            if(!recordingReplay){replay.Begin();recordingReplay=true;stateLabel.text="REPLAY RECORDING";}
+            else{replay.End();recordingReplay=false;stateLabel.text="REPLAY SAVED IN MEMORY";StartCoroutine(PlayReplay());}
+        }
+        private IEnumerator PlayReplay()
+        {
+            var frames=replay.Frames;
+            for(int i=0;i<frames.Count;i++){
+                replay.ApplyFrame(i);
+                yield return null;
+            }
         }
         private void ToggleGrab()
         {
@@ -131,7 +173,7 @@ namespace NooMiBetter
             if(airborne){
                 flightTime+=Time.deltaTime;
                 if(gymnast.LowestY<-.75f){
-                    int reward=flightTime>1.1f?15:5;coins+=reward;score+=reward*20;
+                    int reward=flightTime>1.1f?15:5;coins+=reward;score+=reward*20;AchievementTracker.CountLanding(reward==15);
                     PlayerPrefs.SetInt("nmb_coins",coins);PlayerPrefs.Save();
                     walletLabel.text="COINS  "+coins;scoreLabel.text="SCORE  "+score;
                     stateLabel.text=reward==15?"PERFECT LANDING  +15":"LANDING  +5";ResetPlayer();
