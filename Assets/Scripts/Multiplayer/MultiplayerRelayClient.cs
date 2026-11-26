@@ -27,6 +27,7 @@ namespace NooMiBetter
         public event Action<RoomPose> OnRemotePose;
         int cursor;
         float nextSend;
+        float nextPollTime;
         public IEnumerator CreateRoom(Action<string> completed)
         {
             yield return Post("/api/lobbies", "{}", response => {
@@ -46,7 +47,7 @@ namespace NooMiBetter
                     completed?.Invoke(Connected);
                 });
         }
-        public void Leave(){Connected=false;RoomCode=null;PlayerId=null;cursor=0;}
+        public void Leave(){Connected=false;RoomCode=null;PlayerId=null;cursor=0;polling=false;nextPollTime=0;}
         public void SendPose(Transform target)
         {
             if(!Connected || Time.unscaledTime<nextSend || target==null)return;
@@ -55,7 +56,7 @@ namespace NooMiBetter
             var body=JsonUtility.ToJson(new PoseRequest{playerId=PlayerId,x=p.x,y=p.y,z=p.z,qx=q.x,qy=q.y,qz=q.z,qw=q.w});
             StartCoroutine(Post("/api/lobbies/"+RoomCode+"/events",body,null));
         }
-        private void Update(){if(Connected)StartCoroutine(Poll());}
+        private void Update(){if(Connected && !polling && Time.unscaledTime>=nextPollTime)StartCoroutine(Poll());}
         private IEnumerator Poll()
         {
             // Poll at 5 Hz; only one request is allowed at a time.
@@ -70,7 +71,7 @@ namespace NooMiBetter
                 }
             }
             polling=false;
-            yield return new WaitForSeconds(.2f);
+            nextPollTime=Time.unscaledTime+.2f;
         }
         bool polling;
         private IEnumerator Post(string path,string json,Action<string> success)
