@@ -2,6 +2,8 @@ name: Android APK
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 jobs:
@@ -17,9 +19,8 @@ jobs:
           targetPlatform: Android
           buildMethod: NooMiBetter.Editor.NooMiBuild.BuildAndroid
           androidAppBundle: false
-          customParameters: -quit
       - uses: actions/upload-artifact@v4
         with:
           name: NooMiBetter-Android-APK
-          path: Build/*.apk
+          path: Build/NooMiBetter.apk
           if-no-files-found: error
