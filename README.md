@@ -43,3 +43,19 @@ The Node.js relay server is in `Server/relay-server.js`. Run it with Node.js 18+
 ## License
 
 Project licensing and third-party asset notices will be finalized before a public release.
+
+
+## Current implementation snapshot
+
+The repository now includes a runtime-generated prototype scene (no hand-authored scene asset required), basic bar/grab/release and flip controls, a simple landing/reward loop, workshop obstacle spawning, local profile storage, replay frame capture, texture pattern generation, texture/audio loading helpers, theme palette, and performance presets.
+
+The Unity editor build entry point is `NooMiBetter.Editor.NooMiBuild.BuildAndroid`. The Android workflow expects a valid Unity Personal/Pro license in the GitHub Actions secret `UNITY_LICENSE`. It uploads `Build/NooMiBetter.apk` as an Actions artifact when the build succeeds.
+
+### Known gaps before a public release
+
+- The current gymnast is a physics-driven capsule prototype, not a full articulated ragdoll skeleton.
+- The multiplayer relay is a prototype transport; client-side Unity networking integration, interpolation, reconnect handling and authoritative validation remain to be completed.
+- Audio and texture byte-loading helpers exist; a polished in-game file picker and complete import UX are not yet integrated.
+- The shop and inventory economy are foundational local-profile systems, not a finished content catalog.
+- Replay recording exists; a complete replay browser/export UI remains outstanding.
+- Unity compilation and Android device testing have not yet been performed in this environment.
