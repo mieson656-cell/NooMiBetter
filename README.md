@@ -59,3 +59,8 @@ The Unity editor build entry point is `NooMiBetter.Editor.NooMiBuild.BuildAndroi
 - The shop and inventory economy are foundational local-profile systems, not a finished content catalog.
 - Replay recording exists; a complete replay browser/export UI remains outstanding.
 - Unity compilation and Android device testing have not yet been performed in this environment.
+
+
+## Build status
+
+See [BUILD_STATUS.md](BUILD_STATUS.md) for the implemented prototype, current limitations, and verification status. The current Android build workflow requires a valid Unity license in the repository secret `UNITY_LICENSE`. A successful APK build has not yet been verified.
